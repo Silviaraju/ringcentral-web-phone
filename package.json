@@ -20,7 +20,9 @@
     "docs": "npm run docs:webphone && npm run docs:sipjs"
   },
   "dependencies": {
-    "sip.js": "0.20.0"
+    "sip.js": "0.20.0",
+    "ringcentral-media-redirection-sdk": "git+ssh://git@git.ringcentral.com:rcvdi/ringcentral-media-redirection-sdk.git",
+    "webadapter-vdisdh": "git+ssh://git@git.ringcentral.com:rcvdi/webadapter-vdisdh.git#vdi_upgrade"
   },
   "devDependencies": {
     "@faker-js/faker": "6.0.0",

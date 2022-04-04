@@ -1,5 +1,7 @@
+/* eslint-disable prettier/prettier */
 import { Levels as LogLevels } from 'sip.js/lib/core/log/levels';
 import { LogLevel } from 'sip.js/lib/api/user-agent-options';
+import { Logger } from 'sip.js/lib/core';
 import {
     UserAgent,
     Web,
@@ -10,7 +12,7 @@ import {
 } from 'sip.js';
 
 import { createWebPhoneUserAgent, WebPhoneUserAgent } from './userAgent';
-import { default as MediaStreams, MediaStreamsImpl } from './mediaStreams';
+import { default as MediaStreams, MediaStreamsImplementation } from './mediaStreams';
 import { uuid, delay, extend } from './utils';
 import {
     uuidKey,
@@ -25,14 +27,19 @@ import {
     defaultSessionDescriptionFactory,
     WebPhoneSessionDescriptionHandlerFactoryOptions
 } from './sessionDescriptionHandler';
+import { VDISessionDescriptionHandler } from 'webadapter-vdisdh/src/VDISessionDescriptionHandler';
+import {RingCentralMediaRedirectionSDK as VDI} from 'ringcentral-media-redirection-sdk';
+import config from './config.dev';
+import { defaultMediaStreamFactory } from 'sip.js/lib/platform/web';
 
+/** @ignore */
 export interface TransportServer {
     uri: string;
     isError?: boolean;
 }
 
 export interface WebPhoneRegistrationData {
-    /** Sip Info recieved after registering device with RingCentral */
+    /** Sip Info recieved from the registeration endpoint */
     sipInfo?: Array<SipInfo> | SipInfo;
     /** Sip error codes */
     sipErrorCodes?: string[];
@@ -288,7 +295,7 @@ export default class WebPhone {
     /** Utility function to extend object */
     public static extend = extend;
     public static MediaStreams = MediaStreams;
-    public static MediaStreamsImpl = MediaStreamsImpl;
+    public static MediaStreamsImplementation = MediaStreamsImplementation;
 
     /** Sip Info recieved from the registeration endpoint */
     public sipInfo: SipInfo;
@@ -303,13 +310,6 @@ export default class WebPhone {
 
     // TODO: include 'WebPhone' for all apps other than Chrome and Glip
     // TODO: parse wsservers from new api spec
-    /**
-     *
-     * @param registrationData
-     * @param options
-     *
-     * Creates a new instance of WebPhoneSession that can be used to make and recieve WebRTC calls
-     */
     public constructor(registrationData: WebPhoneRegistrationData = {}, options: WebPhoneOptions = {}) {
         options = Object.assign({}, defaultWebPhoneOptions, options);
 
@@ -357,6 +357,10 @@ export default class WebPhone {
             })
         ];
 
+        console.error('config is ', config);
+        var vdi = new VDI(config);
+        vdi.start();
+
         const sessionDescriptionHandlerFactoryOptions = options.sessionDescriptionHandlerFactoryOptions || {
             iceGatheringTimeout: options.iceCheckingTimeout || 500,
             enableDscp: options.enableDscp,
@@ -364,7 +368,18 @@ export default class WebPhone {
                 iceServers,
                 iceTransportPolicy,
                 sdpSemantics
-            }
+            },
+            peerConnectionOptions: {
+                rtcConfiguration: {
+                    sdpSemantics,
+                    iceServers
+                }
+            },
+            constraints: options.mediaConstraints || defaultMediaConstraints,
+            modifiers,
+            vdiSDK: vdi,
+            enableVDIQos: true,
+            enableVDIMediaReportLogging: true
         };
 
         sessionDescriptionHandlerFactoryOptions.enableDscp = !!options.enableDscp;
@@ -378,8 +393,14 @@ export default class WebPhone {
             options.earlyMedia = true;
         }
 
-        const sessionDescriptionHandlerFactory =
-            options.sessionDescriptionHandlerFactory || defaultSessionDescriptionFactory;
+        const sessionDescriptionHandlerFactory = function(session, options) {
+            const logger: Logger = session.userAgent.getLogger(
+                '[VDI_SDH_HANDLER]',
+                session.id
+            );
+            const mediaStreamFactory = defaultMediaStreamFactory();
+            return new VDISessionDescriptionHandler(logger, mediaStreamFactory, sessionDescriptionHandlerFactoryOptions);
+        };
 
         const sipErrorCodes =
             registrationData.sipErrorCodes && registrationData.sipErrorCodes.length
