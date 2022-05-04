@@ -12,7 +12,7 @@ import {
 } from 'sip.js';
 
 import { createWebPhoneUserAgent, WebPhoneUserAgent } from './userAgent';
-import { default as MediaStreams, MediaStreamsImplementation } from './mediaStreams';
+import { default as MediaStreams, MediaStreamsImpl } from './mediaStreams';
 import { uuid, delay, extend } from './utils';
 import {
     uuidKey,
@@ -27,8 +27,8 @@ import {
     defaultSessionDescriptionFactory,
     WebPhoneSessionDescriptionHandlerFactoryOptions
 } from './sessionDescriptionHandler';
-import { VDISessionDescriptionHandler } from 'webadapter-vdisdh/src/VDISessionDescriptionHandler';
-import {RingCentralMediaRedirectionSDK as VDI} from 'ringcentral-media-redirection-sdk';
+import { VDISessionDescriptionHandler } from '@ringcentral/webadapter-vdisdh/src/VDISessionDescriptionHandler';
+import {RingCentralMediaRedirectionSDK as VDI} from '@ringcentral/ringcentral-media-redirection-sdk';
 import config from './config.dev';
 import { defaultMediaStreamFactory } from 'sip.js/lib/platform/web';
 
@@ -295,7 +295,7 @@ export default class WebPhone {
     /** Utility function to extend object */
     public static extend = extend;
     public static MediaStreams = MediaStreams;
-    public static MediaStreamsImplementation = MediaStreamsImplementation;
+    public static MediaStreamsImplementation = MediaStreamsImpl;
 
     /** Sip Info recieved from the registeration endpoint */
     public sipInfo: SipInfo;

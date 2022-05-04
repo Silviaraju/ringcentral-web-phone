@@ -1,6 +1,6 @@
-import {RCBidirectionalWebsocketRouter} from 'ringcentral-media-redirection-sdk/src/RCBidirectionalWebsocketRouter';
-import {RCRpcMessageDecoder} from 'ringcentral-media-redirection-sdk/src/RCRpcMessageDecoder';
-import {RCRpcMessageEncoder} from 'ringcentral-media-redirection-sdk/src/RCRpcMessageEncoder';
+import {RCBidirectionalWebsocketRouter} from '@ringcentral/ringcentral-media-redirection-sdk/src/RCBidirectionalWebsocketRouter';
+import {RCRpcMessageDecoder} from '@ringcentral/ringcentral-media-redirection-sdk/src/RCRpcMessageDecoder';
+import {RCRpcMessageEncoder} from '@ringcentral/ringcentral-media-redirection-sdk/src/RCRpcMessageEncoder';
 const JSONRPC = require('jsonrpc-bidirectional');
 
 export default {

@@ -4,7 +4,7 @@ import { MediaStreamFactory } from 'sip.js/lib/platform/web/session-description-
 import { SessionDescriptionHandlerConfiguration } from 'sip.js/lib/platform/web/session-description-handler/session-description-handler-configuration';
 import { SessionDescriptionHandlerFactoryOptions } from 'sip.js/lib/platform/web';
 import { Logger } from "sip.js/lib/core";
-import { VDISessionDescriptionHandler } from "webadapter-vdisdh/src/VDISessionDescriptionHandler";
+import { VDISessionDescriptionHandler } from "@ringcentral/webadapter-vdisdh/src/VDISessionDescriptionHandler";
 var Enums_1 = require("../Enums");
 
 export interface WebPhoneSessionDescriptionHandlerConfiguration extends SessionDescriptionHandlerConfiguration {
